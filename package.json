@@ -1,0 +1,37 @@
+{
+  "name": "lab1_node",
+  "version": "1.0.0",
+  "description": "lab 1 ",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "npx prettier . --check",
+    "format:fix": "npx prettier . --write",
+    "prepare": "husky install",
+    "build": "npm install --force"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PolinaHaieva/node.js-lab1.1.git"
+  },
+  "author": "Haieva Polina",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PolinaHaieva/node.js-lab1.1/issues"
+  },
+  "homepage": "https://github.com/PolinaHaieva/node.js-lab1.1#readme",
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-config-semistandard": "^15.0.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.6.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-sonarjs": "^0.23.0",
+    "husky": "^8.0.3",
+    "prettier": "3.1.1"
+  }
+}

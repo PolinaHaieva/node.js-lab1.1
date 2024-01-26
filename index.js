@@ -1,34 +1,38 @@
-import http from "http";
+'use strict';
 
-const proxyServer = http.createServer((clientReq, clientRes) => {
-  const targetUrl = `http://jsonplaceholder.typicode.com${clientReq.url}`;
-  const options = new URL(targetUrl);
-  options.method = clientReq.method;
-  options.headers = clientReq.headers;
-  options.headers.host = "jsonplaceholder.typicode.com"; // Set the Host header
+import { createServer, request as _request } from 'node:http';
 
-  const proxyReq = http.request(options, (proxyRes) => {
-    clientRes.writeHead(proxyRes.statusCode, proxyRes.headers);
-    proxyRes.pipe(clientRes, {
-      end: true,
-    });
+const PORT = 8000;
+
+const receiveBody = async (stream) => {
+  const chunks = [];
+  for await (const chunk of stream) chunks.push(chunk);
+  return Buffer.concat(chunks);
+};
+
+createServer(async (req, res) => {
+  const { headers, url, method } = req;
+  const { pathname, hostname } = new URL(url);
+  const options = { hostname, path: pathname, method, headers };
+
+  const request = _request(options, (response) => {
+    console.log(`Proxying request to: ${hostname}${pathname}, Method: ${method}, Status: ${response.statusCode}`);
+    res.writeHead(response.statusCode, response.headers);
+    response.pipe(res);
   });
 
-  clientReq.pipe(proxyReq, {
-    end: true,
+  request.on('error', (err) => {
+    console.error('Proxy request error:', err.message);
+    res.writeHead(500, { 'Content-Type': 'text/plain' });
+    res.end('Internal Server Error');
   });
 
-  proxyReq.on("error", (err) => {
-    console.error("Proxy request error:", err.message);
-    clientRes.writeHead(500, {
-      "Content-Type": "text/plain",
-    });
-    clientRes.end("Internal Server Error");
-  });
-});
+  if (method === 'POST' || method === 'PUT') {
+    const body = await receiveBody(req);
+    request.write(body);
+  }
 
-const PORT = 3000;
+  request.end();
+}).listen(PORT);
 
-proxyServer.listen(PORT, () => {
-  console.log(`Proxy server listening on port ${PORT}`);
-});
+console.log(`HTTP Proxy listening on port ${PORT}`);
